@@ -1,0 +1,21 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "domainName": {
+            "value": "local.pri"
+        },
+        "domainAdmin": {
+            "value": "cloudguy"
+        },
+        "adminPassword": {
+            "value": "Rem@inN@me1e$$UponAnO@kenThr0ne"
+        },
+        "vnetName": {
+            "value": "adVNET"
+        },
+        "subnetName": {
+            "value": "adSubnet"
+        }
+    }
+}
