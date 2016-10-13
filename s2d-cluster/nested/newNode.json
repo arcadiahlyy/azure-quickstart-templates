@@ -1,0 +1,253 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "vmName"
+            }
+        },
+
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "vnet",
+            "metadata": {
+                "description": "Virtual network name"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "Subnet",
+            "metadata": {
+                "description": "Subnet name"
+            }
+        },
+
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Storage account name"
+            }
+        },
+
+        "availabilitySet": {
+            "type": "string",
+            "metadata": {
+                "description": "Availability set name"
+            }
+        },
+
+        "vmSize": {
+            "type": "string",
+            "metadata": {
+                "description": "Virtual machine type"
+            },
+            "defaultValue": "Standard_DS2",
+            "allowedValues": [
+                "Standard_DS1",
+                "Standard_DS2",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_DS11",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14",
+                "Standard_GS1",
+                "Standard_GS2",
+                "Standard_GS3",
+                "Standard_GS4",
+                "Standard_GS5"
+            ]
+        },
+        "osVersion": {
+            "type": "string",
+            "metadata": {
+                "description": "Windows Server version"
+            },
+            "allowedValues": [
+                "Windows-Server-Technical-Preview",
+                "2016-Technical-Preview-with-Containers"
+            ],
+            "defaultValue": "Windows-Server-Technical-Preview"
+        },
+        "numDataDisks": {
+            "type": "string",
+            "defaultValue": "4",
+            "allowedValues": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16"
+            ],
+            "metadata": {
+                "description": "This parameter allows the user to select the number of disks wanted"
+            }
+        },
+        "diskSizeGB": {
+            "type": "int",
+            "minValue": 1,
+            "maxValue": 1024,
+            "metadata": {
+                "description": "Size of the data disks"
+            }
+        },
+
+        "domainName": {
+            "type": "string",
+            "metadata": {
+                "description": "Domain name"
+            }
+        },
+        "domainAdmin": {
+            "type": "string",
+            "metadata": {
+                "description": "Domain administrator account name"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for the domain administrator account"
+            }
+        }
+    },
+
+    "variables": {
+        "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+        "subnetId": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+
+        "nicName": "[concat(parameters('vmName'), '-nic')]",
+
+        "containerName": "vhds",
+
+        "template": {
+            "base": "https://raw.githubusercontent.com/mmarch/azure-quickstart-templates/s2d-cluster/s2d-cluster/",
+            "diskSelection": "nested/diskSelection.json"
+        }
+    },
+
+    "resources": [
+
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(parameters('vmName'), '-nic')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetId')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "diskSelection",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('template').base, variables('template').diskSelection)]"
+                },
+                "parameters": {
+                    "numDataDisks": {
+                        "value": "[parameters('numDataDisks')]"
+                    },
+                    "diskSizeGB": {
+                        "value": "[parameters('diskSizeGB')]"
+                    },
+                    "diskCaching": {
+                        "value": "None"
+                    },
+                    "storageAccountName": {
+                        "value": "[parameters('storageAccountName')]"
+                    },
+                    "containerName": {
+                        "value": "[variables('containerName')]"
+                    },
+                    "diskNamingPrefix": {
+                        "value": "[concat(parameters('vmName'), '-data')]"
+                    }
+                }
+            }
+        },
+
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('vmName')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets/', parameters('availabilitySet'))]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('domainAdmin')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "[parameters('osVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))).primaryEndpoints.blob, variables('containerName'),'/',parameters('vmName'),'-osdisk.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": "[reference('diskSelection').outputs.dataDiskArray.value]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+
+    "outputs": {
+
+        "uniqueString": {
+            "type": "string",
+            "value": "[uniqueString(resourceGroup().id)]"
+        }
+    }
+}
