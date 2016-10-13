@@ -75,12 +75,12 @@
                 "description": "Number of data disks per node"
             }
         },
-        "diskSizeGB": {
+        "diskSizeGb": {
             "type": "int",
             "minValue": 1,
             "maxValue": 1024,
             "metadata": {
-                "description": "Data disk size"
+                "description": "Data disk size (in GB)"
             }
         },
 
@@ -106,8 +106,17 @@
         "template": {
             "base": "https://raw.githubusercontent.com/mmarch/azure-quickstart-templates/s2d-template/s2d-cluster/",
             "newNode": "nested/newNode.json"
-        }
-
+        },
+        "p": {
+            "domain": "[concat(' -domain ', parameters('domainName'))]",
+            "user": "[concat(' -username ', parameters('domainAdmin'))]",
+            "pwd": "[concat(' -password ', parameters('adminPassword'))]",
+            "prefix": "[concat(' -nodeNamingPrefix ', 's2dfs-node-')]",
+            "numnodes": "[concat(' -numNodes ', parameters('numNodes'))]",
+            "sa": "[concat(' -storageAccountName ', 'CloudWitnessStorageAccount')]",
+            "saskey": "[concat(' -storageAccountAccessKey ', 'sasKey')]"
+        },
+        "scriptParameters": "[concat(variables('p').domain, variables('p').user, variables('p').pwd, variables('p').prefix, variables('p').numnodes, variables('p').sa, variables('p').saskey)]"
     },
 
     "resources": [
@@ -138,13 +147,10 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
             "copy": {
-                "name": "nodeLoop",
+                "name": "s2dfs-node-loop",
                 "count": "[parameters('numNodes')]"
             },
-            "name": "[concat('node', copyindex())]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySet'))]"
-            ],
+            "name": "[concat('s2dfs-node-loop-', copyindex())]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -154,34 +160,15 @@
                     "vmName": {
                         "value": "[concat('s2dfs-vm-', copyindex())]"
                     },
-
-                    "vnetName": {
-                        "value": "[parameters('vnetName')]"
-                    },
-                    "subnetName": {
-                        "value": "[parameters('subnetName')]"
-                    },
-
                     "storageAccountName": {
-                        "value": "[concat(variables('storageAccountNamePrefix'), copyindex())]"
+                        "value": "[concat( variables('storageAccountNamePrefix'), copyindex() )]"
                     },
                     "availabilitySet": {
                         "value": "[variables('availabilitySet')]"
                     },
-
-                    "vmSize": {
-                        "value": "[parameters('vmSize')]"
-                    },
-                    "osVersion": {
-                        "value": "[parameters('osVersion')]"
-                    },
-                    "numDataDisks": {
-                        "value": "[parameters('numDisksPerNode')]"
-                    },
                     "diskSizeGB": {
-                        "value": "[parameters('diskSizeGB')]"
+                        "value": "[parameters('diskSizeGb')]"
                     },
-
                     "domainName": {
                         "value": "[parameters('domainName')]"
                     },
@@ -191,6 +178,33 @@
                     "adminPassword": {
                         "value": "[parameters('adminPassword')]"
                     }
+                }
+            }
+        },
+
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "s2dfs-vm-0/customscript",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "s2dfs-node-loop"
+            ],
+            "tags": {
+                "displayName": "script"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.8",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "concat(variables('template').base, 'Scripts/script.ps1)"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat( 'powershell -noninteractive -executionpolicy bypass -file script.ps1 ', variables('scriptParameters'), ' >> script.log 2>&1' )]"
                 }
             }
         }
