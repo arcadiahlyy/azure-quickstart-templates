@@ -68,34 +68,19 @@
             },
             "allowedValues": [
                 "Windows-Server-Technical-Preview",
-                "2016-Technical-Preview-with-Containers"
+                "2016-Technical-Preview-with-Containers",
+                "2016-Datacenter"
             ],
             "defaultValue": "Windows-Server-Technical-Preview"
         },
+
         "numDataDisks": {
-            "type": "string",
-            "defaultValue": "4",
-            "allowedValues": [
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12",
-                "13",
-                "14",
-                "15",
-                "16"
-            ],
+            "type": "int",
+            "defaultValue": 2,
+            "minValue": 0,
+            "maxValue": 16,
             "metadata": {
-                "description": "This parameter allows the user to select the number of disks wanted"
+                "description": "Number of data disks"
             }
         },
         "diskSizeGB": {
