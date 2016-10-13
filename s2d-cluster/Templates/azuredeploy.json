@@ -143,8 +143,7 @@
             },
             "name": "[concat('node', copyindex())]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySet'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountNamePrefix'), copyIndex())]"
+                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySet'))]"
             ],
             "properties": {
                 "mode": "Incremental",
