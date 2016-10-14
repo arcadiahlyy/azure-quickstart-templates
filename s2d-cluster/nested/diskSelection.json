@@ -55,7 +55,7 @@
 
         "diskArray": [
             {
-                "name": "datadisk0",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk0')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 0,
                 "vhd": {
@@ -65,7 +65,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk1",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk1')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 1,
                 "vhd": {
@@ -75,7 +75,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk2",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk2')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 2,
                 "vhd": {
@@ -85,7 +85,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk3",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk3')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 3,
                 "vhd": {
@@ -95,7 +95,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk4",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk4')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 4,
                 "vhd": {
@@ -105,7 +105,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk5",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk5')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 5,
                 "vhd": {
@@ -115,7 +115,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk6",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk6')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 6,
                 "vhd": {
@@ -125,7 +125,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk7",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk7')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 7,
                 "vhd": {
@@ -135,7 +135,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk8",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk8')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 8,
                 "vhd": {
@@ -145,7 +145,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk9",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk9')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 9,
                 "vhd": {
@@ -155,7 +155,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk10",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk10')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 10,
                 "vhd": {
@@ -165,7 +165,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk11",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk11')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 11,
                 "vhd": {
@@ -175,7 +175,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk12",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk12')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 12,
                 "vhd": {
@@ -185,7 +185,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk13",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk13')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 13,
                 "vhd": {
@@ -195,7 +195,7 @@
                 "createOption": "Empty"
             },
             {
-                "name": "datadisk14",
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk14')]",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 14,
                 "vhd": {
@@ -205,11 +205,11 @@
                 "createOption": "Empty"
             },
             {
+                "name": "[concat(parameters('diskNamingPrefix'), 'disk15')]",
                 "caching": "None",
                 "createOption": "Empty",
                 "diskSizeGB": "[parameters('diskSizeGb')]",
                 "lun": 15,
-                "name": "datadisk15",
                 "vhd": {
                     "Uri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/',parameters('containerName'),'/',parameters('diskNamingPrefix'),'disk-15.vhd')]"
                 }
