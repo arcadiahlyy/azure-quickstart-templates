@@ -13,7 +13,7 @@
         "diskSizeGb": {
             "type": "int",
             "minValue": 1,
-            "maxValue": 1024,
+            "maxValue": 1023,
             "metadata": {
                 "description": "Size of the data disks"
             }

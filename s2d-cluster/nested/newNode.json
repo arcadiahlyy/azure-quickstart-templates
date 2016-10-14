@@ -76,19 +76,19 @@
 
         "numDataDisks": {
             "type": "int",
-            "defaultValue": 2,
+            "defaultValue": 0,
             "minValue": 0,
             "maxValue": 16,
             "metadata": {
                 "description": "Number of data disks"
             }
         },
-        "diskSizeGB": {
+        "diskSizeGb": {
             "type": "int",
             "minValue": 1,
-            "maxValue": 1024,
+            "maxValue": 1023,
             "metadata": {
-                "description": "Size of the data disks"
+                "description": "Size of the data disks in GB"
             }
         },
 
@@ -113,6 +113,7 @@
     },
 
     "variables": {
+
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
         "subnetId": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
 
@@ -210,7 +211,7 @@
                     "osDisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat(reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))).primaryEndpoints.blob, variables('containerName'),'/',parameters('vmName'),'-osdisk.vhd')]"
+                            "uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/', variables('containerName'),'/',parameters('vmName'),'-osdisk.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -225,42 +226,49 @@
                     ]
                 }
             },
-            {
-                "type": "extensions",
-                "apiVersion": "2015-06-15",
-                "name": "[concat(parameters('vmName'),'/sessionhost')]",
-                "location": "[resourceGroup().location]",
-                "properties": {
-                    "publisher": "Microsoft.Powershell",
-                    "type": "DSC",
-                    "typeHandlerVersion": "2.11",
-                    "autoUpgradeMinorVersion": true,
-                    "settings": {
-                        "ModulesUrl": "[concat(variables('template').base,'/Configuration.zip')]",
-                        "ConfigurationFunction": "Configuration.ps1\\S2DFSNode",
-                        "Properties": {
-                            "DomainName": "[parameters('domainName')]",
-                            "AdminCreds": {
-                                "UserName": "[parameters('domainAdmin')]",
-                                "Password": "PrivateSettingsRef:AdminPassword"
+
+            "resources": [
+                {
+                    "type": "extensions",
+                    "apiVersion": "2015-06-15",
+                    "name": "node-config",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Powershell",
+                        "type": "DSC",
+                        "typeHandlerVersion": "2.19",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "ModulesUrl": "[concat(variables('template').base,'DSC/Configuration.zip')]",
+                            "ConfigurationFunction": "Configuration.ps1\\S2DFSNode",
+                            "Properties": {
+                                "DomainName": "[parameters('domainName')]",
+                                "AdminCreds": {
+                                    "UserName": "[parameters('domainAdmin')]",
+                                    "Password": "PrivateSettingsRef:AdminPassword"
+                                }
                             }
-                        }
-                    },
-                    "protectedSettings": {
-                        "Items": {
-                            "AdminPassword": "[parameters('adminPassword')]"
+                        },
+                        "protectedSettings": {
+                            "Items": {
+                                "AdminPassword": "[parameters('adminPassword')]"
+                            }
                         }
                     }
                 }
-            }
+            ]
         }
     ],
 
     "outputs": {
 
-        "uniqueString": {
+        "nodeName": {
             "type": "string",
-            "value": "[uniqueString(resourceGroup().id)]"
+            "value": "[parameters('vmName')]"
         }
     }
 }
+
