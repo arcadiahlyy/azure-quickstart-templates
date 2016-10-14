@@ -152,7 +152,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
-            "name": "diskSelection",
+            "name": "[concat(parameters('vmName'),'-diskSelection')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -216,7 +216,7 @@
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
                     },
-                    "dataDisks": "[reference('diskSelection').outputs.dataDiskArray.value]"
+                    "dataDisks": "[reference(concat(parameters('vmName'),'-diskSelection')).outputs.dataDiskArray.value]"
                 },
                 "networkProfile": {
                     "networkInterfaces": [
