@@ -34,6 +34,10 @@
     <Content Include="Deploy-AzureResourceGroup.ps1" />
     <Content Include="Templates\azuredeploy.json" />
     <Content Include="Templates\azuredeploy.parameters.json" />
+    <None Include="DSC\Configuration.zip" />
+    <None Include="nested\diskSelection.json" />
+    <None Include="nested\newNode.json" />
+    <None Include="Scripts\Script.ps1" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
