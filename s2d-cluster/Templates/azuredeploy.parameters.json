@@ -16,6 +16,23 @@
         },
         "subnetName": {
             "value": "adSubnet"
+        },
+
+        "numNodes": {
+            "value": 2
+        },
+        "vmSize": {
+            "value": "Standard_DS2"
+        },
+        "numDisksPerNode": {
+            "value": 2
+        },
+        "diskSizeGb": {
+            "value": 1023
+        },
+
+        "osVersion": {
+            "value": "2016-Datacenter"
         }
     }
 }

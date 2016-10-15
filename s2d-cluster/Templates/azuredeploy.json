@@ -78,7 +78,7 @@
         "diskSizeGb": {
             "type": "int",
             "minValue": 1,
-            "maxValue": 1024,
+            "maxValue": 1023,
             "metadata": {
                 "description": "Data disk size (in GB)"
             }
@@ -100,6 +100,7 @@
 
     "variables": {
 
+        "vmNamingPrefix": "s2dfs-vm",
         "availabilitySet": "s2d-cluster",
         "storageAccountNamePrefix": "[concat(uniqueString(resourceGroup().id), 's2dfs')]",
 
@@ -125,14 +126,16 @@
             "type": "Microsoft.Compute/availabilitySets",
             "apiVersion": "2015-06-15",
             "location": "[resourceGroup().location]",
-            "name": "[variables('availabilitySet')]"
+            "name": "[variables('availabilitySet')]",
+            "properties": {
+            }
         },
 
         {
-            "kind": "Storage",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2016-01-01",
             "location": "[resourceGroup().location]",
+            "kind": "Storage",
             "copy": {
                 "name": "s2dfs-sa-loop",
                 "count": "[parameters('numNodes')]"
@@ -140,7 +143,10 @@
             "name": "[concat(variables('storageAccountNamePrefix'), copyindex())]",
             "sku": {
                 "name": "Premium_LRS"
+            },
+            "properties": {
             }
+
         },
 
         {
@@ -150,7 +156,7 @@
                 "name": "s2dfs-node-loop",
                 "count": "[parameters('numNodes')]"
             },
-            "name": "[concat('s2dfs-node-loop-', copyindex())]",
+            "name": "[concat('s2dfs-node-', copyindex())]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -158,17 +164,34 @@
                 },
                 "parameters": {
                     "vmName": {
-                        "value": "[concat('s2dfs-vm-', copyindex())]"
+                        "value": "[concat(variables('vmNamingPrefix'), copyindex())]"
+                    },
+                    "vnetName": {
+                        "value": "[parameters('vnetName')]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('subnetName')]"
                     },
                     "storageAccountName": {
-                        "value": "[concat( variables('storageAccountNamePrefix'), copyindex() )]"
+                        "value": "[concat(variables('storageAccountNamePrefix'), copyindex())]"
                     },
                     "availabilitySet": {
                         "value": "[variables('availabilitySet')]"
                     },
-                    "diskSizeGB": {
+
+                    "vmSize": {
+                        "value": "[parameters('vmSize')]"
+                    },
+                    "osVersion": {
+                        "value": "[parameters('osVersion')]"
+                    },
+                    "numDataDisks": {
+                        "value": "[parameters('numDisksPerNode')]"
+                    },
+                    "diskSizeGb": {
                         "value": "[parameters('diskSizeGb')]"
                     },
+
                     "domainName": {
                         "value": "[parameters('domainName')]"
                     },
@@ -185,7 +208,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2015-06-15",
-            "name": "s2dfs-vm-0/customscript",
+            "name": "[concat(variables('vmNamingPrefix'), '0/customscript')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "s2dfs-node-loop"
@@ -200,7 +223,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "concat(variables('template').base, 'Scripts/script.ps1)"
+                        "[concat(variables('template').base, 'Scripts/script.ps1')]"
                     ]
                 },
                 "protectedSettings": {
@@ -214,7 +237,7 @@
 
         "uniqueString": {
             "type": "string",
-            "value": "[uniqueString(resourceGroup().id)]"
+            "value": "[concat(variables('template').base, variables('template').newNode)]"
         }
     }
 }
