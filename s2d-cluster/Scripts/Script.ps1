@@ -12,7 +12,7 @@ param(
     [parameter(mandatory = $true)]       
     [int]$numNodes,
 
-	[parameter(mandatory = $true)]       
+    [parameter(mandatory = $true)]       
     [string]$storageAccountName,
     [parameter(mandatory = $true)] 
     [string]$storageAccountAccessKey,
@@ -30,7 +30,7 @@ param(
 
     log "script running..."
 
-	whoami
+    whoami
 
     if ($extraParameters) 
     {
@@ -45,7 +45,7 @@ param(
 
 	#  1. Create cluster
 	#
-	New-Cluster -Name s2d-cluster -Node $nodes –NoStorage #–StaticAddress [new address within your addr space]
+	New-Cluster -Name s2d-cluster -Node $nodes -NoStorage  #–StaticAddress [new address within your addr space]
 
 
 	#  2. Configure cloud witness
