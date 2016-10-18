@@ -25,10 +25,10 @@
             "value": "Standard_DS2"
         },
         "numDisksPerNode": {
-            "value": 2
+            "value": 3
         },
         "diskSizeGb": {
-            "value": 1023
+            "value": 512
         },
 
         "osVersion": {

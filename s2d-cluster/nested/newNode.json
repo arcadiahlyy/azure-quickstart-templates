@@ -67,9 +67,8 @@
                 "description": "Windows Server version"
             },
             "allowedValues": [
-                "Windows-Server-Technical-Preview",
-                "2016-Technical-Preview-with-Containers",
-                "2016-Datacenter"
+                "2016-Datacenter",
+                "2016-Technical-Preview-with-Containers"
             ],
             "defaultValue": "Windows-Server-Technical-Preview"
         },
