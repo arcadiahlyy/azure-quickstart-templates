@@ -44,6 +44,11 @@ param(
 
 	install-windowsfeature rsat-clustering-powerShell 
 
+
+	log "impersonating domain admin $domain\$username..."
+	.\New-ImpersonateUser.ps1 -Username $username -Domain $domain -Password $password
+
+
 	#  1. Create cluster
 	#
 	if (-not (get-cluster -ea ignore))
