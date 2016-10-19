@@ -39,14 +39,18 @@ param(
     }
 
 
-	$nodes = 0..$($numNodes - 1) | % { "$nodeNamingPrefix-$_.$domain" }
+	$nodes = 0..$($numNodes - 1) | % { "$nodeNamingPrefix$_.$domain" }
 	log "list of new servers:";  $nodes | % { "    $($_.tolower())" }
 
+	install-windowsfeature rsat-clustering-powerShell 
 
 	#  1. Create cluster
 	#
-	New-Cluster -Name s2d-cluster -Node $nodes -NoStorage  #–StaticAddress [new address within your addr space]
-
+	if (-not (get-cluster))
+	{
+		$clusterName = get-date -f yyyyMMdd-HHmmss
+		new-cluster -Name $clusterName -Node $nodes -NoStorage  #-StaticAddress [new address within your addr space]
+	}
 
 	#  2. Configure cloud witness
 	#
