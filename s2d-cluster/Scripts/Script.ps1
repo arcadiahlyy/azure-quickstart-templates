@@ -46,10 +46,10 @@ param(
 
 	#  1. Create cluster
 	#
-	if (-not (get-cluster))
+	if (-not (get-cluster -ea ignore))
 	{
 		$clusterName = get-date -f yyyyMMdd-HHmmss
-		new-cluster -Name $clusterName -Node $nodes -NoStorage  #-StaticAddress [new address within your addr space]
+		new-cluster -Name $clusterName -Node $nodes -NoStorage -ea Stop #-StaticAddress [new address within your addr space]
 	}
 
 	#  2. Configure cloud witness
